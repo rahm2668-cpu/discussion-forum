@@ -75,6 +75,7 @@
     "jsdom": "^27.0.1",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
+    "start-server-and-test": "^2.1.2",
     "tailwindcss": "^4.1.16",
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
@@ -88,6 +89,7 @@
     "build": "vite build",
     "test": "vitest",
     "e2e": "cypress run",
+    "ci:test": "vitest --no-watch && start-server-and-test dev http-get://0.0.0.0:5173 e2e",
     "lint": "eslint src cypress --ext .ts,.tsx,.js,.jsx"
   }
 }
