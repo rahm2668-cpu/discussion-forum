@@ -1,5 +1,6 @@
 import { ThumbsUp, ThumbsDown, Flag, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { motion } from "framer-motion";
 import { Post } from "../../types/forum";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
@@ -83,24 +84,28 @@ export function PostCard({
           />
 
           <div className="flex items-center gap-2">
-            <Button
-              variant={hasUpVoted ? "default" : "ghost"}
-              size="sm"
-              className={`gap-2 ${hasUpVoted ? "bg-red-500 hover:bg-red-600 text-white" : ""}`}
-              onClick={() => onUpVote?.(post.id)}
-            >
-              <ThumbsUp className="w-4 h-4" />
-              <span>{post.likes}</span>
-            </Button>
-            <Button
-              variant={hasDownVoted ? "destructive" : "ghost"}
-              size="sm"
-              className={`gap-2 ${hasDownVoted ? "bg-blue-500 hover:bg-blue-600 text-white" : ""}`}
-              onClick={() => onDownVote?.(post.id)}
-            >
-              <ThumbsDown className="w-4 h-4" />
-              <span>{post.dislikes}</span>
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant={hasUpVoted ? "default" : "ghost"}
+                size="sm"
+                className={`gap-2 ${hasUpVoted ? "bg-red-500 hover:bg-red-600 text-white" : ""}`}
+                onClick={() => onUpVote?.(post.id)}
+              >
+                <ThumbsUp className="w-4 h-4" />
+                <span>{post.likes}</span>
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant={hasDownVoted ? "destructive" : "ghost"}
+                size="sm"
+                className={`gap-2 ${hasDownVoted ? "bg-blue-500 hover:bg-blue-600 text-white" : ""}`}
+                onClick={() => onDownVote?.(post.id)}
+              >
+                <ThumbsDown className="w-4 h-4" />
+                <span>{post.dislikes}</span>
+              </Button>
+            </motion.div>
             <div className="ml-2 text-sm font-medium text-muted-foreground">
               Score: {voteCount}
             </div>
