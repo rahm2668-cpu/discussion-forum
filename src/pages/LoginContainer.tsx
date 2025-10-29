@@ -63,7 +63,7 @@ export function LoginContainer() {
             </div>
             <h1 className="text-3xl mb-2">Welcome Back</h1>
             <p className="text-muted-foreground text-center">
-              Log in to your Dicoding Forum account
+              Log in to your Discussion Forum account
             </p>
           </div>
 
