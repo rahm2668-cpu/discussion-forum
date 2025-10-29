@@ -58,8 +58,8 @@ describe("Login E2E Tests", () => {
     cy.get('[data-testid="password-input"]').type("password123");
     cy.get('button[type="submit"]').click();
 
-    // cek apakah toast error muncul
-    cy.get(".toaster").should("contain", "Please fill in all fields");
+    // cek apakah error message muncul di form
+    cy.contains("Email is required").should("be.visible");
   });
 
   it("should display alert when password is empty", () => {
@@ -67,8 +67,8 @@ describe("Login E2E Tests", () => {
     cy.get('[data-testid="email-input"]').type("user@example.com");
     cy.get('button[type="submit"]').click();
 
-    // cek apakah toast error muncul
-    cy.get(".toaster").should("contain", "Please fill in all fields");
+    // cek apakah error message muncul di form
+    cy.contains("Password is required").should("be.visible");
   });
 
   it("should display alert when email or password is incorrect", () => {
