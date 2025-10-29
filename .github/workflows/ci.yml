@@ -23,12 +23,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Start Vite dev server in background
-      - name: Start Vite server
-        run: |
-          npm run dev -- --port 3000 &
-          npx wait-on http://localhost:3000
-
       # Run Cypress tests
       - name: Run Cypress tests
         run: npm run ci:test
