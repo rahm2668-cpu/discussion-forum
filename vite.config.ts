@@ -54,7 +54,7 @@ export default defineConfig({
     outDir: "dist",
   },
   server: {
-    port: 3001,
+    port: 3000,
     open: true,
   },
 });
