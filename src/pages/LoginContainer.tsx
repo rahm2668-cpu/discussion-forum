@@ -1,23 +1,36 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
 import { Card } from "../components/ui/card";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "../components/ui/form";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { loginUser, clearError, setError } from "../store/slices/authSlice";
+import { loginUser, clearError } from "../store/slices/authSlice";
 
 export function LoginContainer() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const { isAuthenticated, isLoading, error } = useAppSelector(
     (state) => state.auth
   );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -32,16 +45,9 @@ export function LoginContainer() {
     }
   }, [error, dispatch]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!email || !password) {
-      dispatch(setError("Please fill in all fields"));
-      return;
-    }
-
+  const onSubmit = async (data: { email: string; password: string }) => {
     try {
-      await dispatch(loginUser({ email, password })).unwrap();
+      await dispatch(loginUser(data)).unwrap();
       toast.success("Successfully logged in!");
       navigate("/");
     } catch (err) {
@@ -67,44 +73,62 @@ export function LoginContainer() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your.email@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-                data-testid="email-input"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                rules={{ required: "Email is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="your.email@example.com"
+                        disabled={isLoading}
+                        data-testid="email-input"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-                data-testid="password-input"
+              <FormField
+                control={form.control}
+                name="password"
+                rules={{ required: "Password is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter your password"
+                        disabled={isLoading}
+                        data-testid="password-input"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Logging in...
-                </>
-              ) : (
-                "Log In"
-              )}
-            </Button>
-          </form>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  "Log In"
+                )}
+              </Button>
+            </form>
+          </Form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">

@@ -1,28 +1,41 @@
-import {useState, useEffect} from 'react';
-import {useNavigate, Link} from 'react-router-dom';
-import {toast} from 'sonner';
-import {Loader2, MessageSquare} from 'lucide-react';
-import {Button} from '../components/ui/button';
-import {Input} from '../components/ui/input';
-import {Label} from '../components/ui/label';
-import {Card} from '../components/ui/card';
-import {useAppDispatch, useAppSelector} from '../store/hooks';
-import {registerUser, clearError} from '../store/slices/authSlice';
+import { useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "sonner";
+import { Loader2, MessageSquare } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Card } from "../components/ui/card";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "../components/ui/form";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { registerUser, clearError } from "../store/slices/authSlice";
 
 export function RegisterContainer() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const {isAuthenticated, isLoading, error} = useAppSelector(
-      (state) => state.auth,
+  const { isAuthenticated, isLoading, error } = useAppSelector(
+    (state) => state.auth
   );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate("/");
     }
   }, [isAuthenticated, navigate]);
 
@@ -33,30 +46,24 @@ export function RegisterContainer() {
     }
   }, [error, dispatch]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!name || !email || !password || !confirmPassword) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-
+  const onSubmit = async (data: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }) => {
     try {
-      await dispatch(registerUser({name, email, password})).unwrap();
-      toast.success('Account created successfully!');
-      navigate('/');
+      await dispatch(
+        registerUser({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        })
+      ).unwrap();
+      toast.success("Account created successfully!");
+      navigate("/");
     } catch (err) {
-      console.error('Registration error:', err);
+      console.error("Registration error:", err);
     }
   };
 
@@ -69,79 +76,119 @@ export function RegisterContainer() {
           </div>
           <h1 className="text-3xl mb-2">Create Account</h1>
           <p className="text-muted-foreground text-center">
-            Join the Dicoding Forum community
+            Join the Discussion Forum community
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="John Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={isLoading}
-              required
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              rules={{ required: "Full name is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="John Doe"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your.email@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              required
+            <FormField
+              control={form.control}
+              name="email"
+              rules={{ required: "Email is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="your.email@example.com"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="At least 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
+            <FormField
+              control={form.control}
+              name="password"
+              rules={{
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters long",
+                },
+              }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="At least 6 characters"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Re-enter your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={isLoading}
-              required
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              rules={{
+                required: "Confirm password is required",
+                validate: (value) =>
+                  value === form.getValues("password") ||
+                  "Passwords do not match",
+              }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Re-enter your password"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Creating account...
-              </>
-            ) : (
-              'Create Account'
-            )}
-          </Button>
-        </form>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </Button>
+          </form>
+        </Form>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Already have an account?
-            {' '}
+            Already have an account?{" "}
             <Link to="/login" className="text-primary hover:underline">
               Log in
             </Link>
