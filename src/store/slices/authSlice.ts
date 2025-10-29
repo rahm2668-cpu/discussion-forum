@@ -57,7 +57,7 @@ export const loginUser = createAsyncThunk(
     const token = await apiLogin({ email, password });
     const profile = await getOwnProfile(token);
     localStorage.setItem("auth_token", token);
-    return {};
+    return { token, user: profile };
   }
 );
 
