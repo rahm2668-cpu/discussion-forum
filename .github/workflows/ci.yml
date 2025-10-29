@@ -13,24 +13,21 @@ jobs:
         node-version: [20]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build production
-        run: npm run build
-
-      - name: Serve build folder
-        run: npx serve -s dist -l 5173 &
-
-      - name: Wait for server
-        run: npx wait-on http://localhost:5173
+      # Start Vite dev server in background with port 3000
+      - name: Start Vite server
+        run: |
+          PORT=3000 npm run dev &
+          npx wait-on http://localhost:3000
 
       - name: Run Cypress tests
-        run: npx cypress run
+        run: npm run ci:test
