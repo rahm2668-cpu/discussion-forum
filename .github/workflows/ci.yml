@@ -13,21 +13,31 @@ jobs:
         node-version: [20]
 
     steps:
-      - uses: actions/checkout@v2
+      # 1. Checkout repository
+      - uses: actions/checkout@v3
 
+      # 2. Setup Node.js
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
+      # 3. Install dependencies
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: Start Vite server in background
-        run: npm run dev &
+      # 4. Build production
+      - name: Build production
+        run: npm run build
 
-      - name: Wait for server to be ready
+      # 5. Serve built app in background
+      - name: Serve build folder
+        run: npx serve -s build -l 5173 &
+
+      # 6. Wait until server is ready
+      - name: Wait for server
         run: npx wait-on http://localhost:5173
 
+      # 7. Run Cypress tests
       - name: Run Cypress tests
         run: npx cypress run
