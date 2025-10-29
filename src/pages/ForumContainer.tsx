@@ -278,7 +278,7 @@ export function ForumContainer() {
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="w-5 h-5" />
               </Button>
-              <h1 className="text-2xl">Discussion Forum</h1>
+              <h1 className="text-2xl">Discussion Forum App</h1>
             </div>
 
             <div className="hidden md:flex flex-1 max-w-md">
