@@ -76,7 +76,7 @@ export function RegisterContainer() {
           </div>
           <h1 className="text-3xl mb-2">Create Account</h1>
           <p className="text-muted-foreground text-center">
-            Join the Dicoding Forum community
+            Join the Discussion Forum community
           </p>
         </div>
 
