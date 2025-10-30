@@ -47,6 +47,7 @@ describe("threadsReducer function", () => {
   });
 
   it("should clear selectedThreadDetail when clearSelectedThread is dispatched", () => {
+    // Arrange
     const mockThread: Thread = {
       id: "123",
       title: "Thread",
@@ -64,11 +65,13 @@ describe("threadsReducer function", () => {
       createdAt: "2023-01-01",
       lastActivity: "2023-01-01",
     };
+    // Action
     const stateWithThread = {
       ...initialState,
       selectedThreadDetail: mockThread,
     };
     const nextState = threadsReducer(stateWithThread, clearSelectedThread());
+    // Assert
     expect(nextState.selectedThreadDetail).toBeNull();
   });
 });

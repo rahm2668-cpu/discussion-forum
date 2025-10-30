@@ -46,8 +46,8 @@ import { loadUsers } from "../store/slices/usersSlice";
 import {
   loadThreads,
   loadThreadDetail,
-  addLocalThread,
-  addLocalReply,
+  createThread,
+  addReply,
   voteOnPost,
   setSelectedThreadDetail,
 } from "../store/slices/threadsSlice";
@@ -128,12 +128,9 @@ export function ForumContainer() {
 
     try {
       const result = await dispatch(
-        addLocalThread({ title, content, category })
+        createThread({ title, body: content, category })
       ).unwrap();
-      toast.success("Thread created locally (demo mode)");
-      toast.info(
-        "Thread creation requires authentication. Using read-only API access."
-      );
+      toast.success("Thread created successfully!");
       // Navigate to the newly created thread
       navigate(`/threads/${result.thread.id}`);
     } catch (error) {
@@ -150,14 +147,11 @@ export function ForumContainer() {
     }
 
     try {
-      await dispatch(addLocalReply(content)).unwrap();
-      toast.success("Reply added locally (demo mode)");
-      toast.info(
-        "Replying requires authentication. Using read-only API access."
-      );
+      await dispatch(addReply(content)).unwrap();
+      toast.success("Reply posted successfully!");
     } catch (error) {
       console.error("Error posting reply:", error);
-      toast.error("Failed to post reply");
+      toast.error("Failed to post reply. Please try again.");
     }
   };
 

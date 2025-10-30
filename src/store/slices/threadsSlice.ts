@@ -69,10 +69,8 @@ export const loadThreadDetail = createAsyncThunk(
       throw new Error("Local thread not found");
     }
 
-    const { users } = state.users;
     const threadDetail = await fetchThreadDetail(threadId);
-    const owner = users.find((u) => u.id === threadDetail.ownerId);
-    return transformThreadDetail(threadDetail, owner);
+    return transformThreadDetail(threadDetail);
   }
 );
 
@@ -130,58 +128,27 @@ export const voteOnPost = createAsyncThunk(
   }
 );
 
-export const addLocalThread = createAsyncThunk(
-  "threads/addLocalThread",
+export const createThread = createAsyncThunk(
+  "threads/createThread",
   async (
     {
       title,
-      content,
+      body,
       category,
-    }: { title: string; content: string; category: string },
+    }: { title: string; body: string; category: string },
     { getState }
   ) => {
     const state = getState() as RootState;
-    const { user } = state.auth;
+    const { token } = state.auth;
 
-    if (!user) {
+    if (!token) {
       throw new Error("User not authenticated");
     }
 
-    const newThread: Thread = {
-      id: `local-thread-${Date.now()}`,
-      title,
-      author: {
-        id: user.id,
-        name: user.name,
-        avatar: user.avatar,
-        role: "Member",
-        posts: 0,
-        joined: new Date().toISOString().split("T")[0],
-      },
-      category,
-      views: 0,
-      createdAt: new Date().toISOString(),
-      lastActivity: new Date().toISOString(),
-      posts: [
-        {
-          id: `local-post-${Date.now()}`,
-          author: {
-            id: user.id,
-            name: user.name,
-            avatar: user.avatar,
-            role: "Member",
-            posts: 0,
-            joined: new Date().toISOString().split("T")[0],
-          },
-          content,
-          timestamp: new Date().toISOString(),
-          likes: 0,
-          dislikes: 0,
-          upVotesBy: [],
-          downVotesBy: [],
-        },
-      ],
-    };
+    const apiThread = await import("../../services/api").then((m) =>
+      m.createThread(title, body, category, token)
+    );
+    const thread = transformThread(apiThread, undefined);
 
     // Check if category exists, if not add it
     const existingCategory = state.threads.categories.find(
@@ -200,18 +167,18 @@ export const addLocalThread = createAsyncThunk(
       };
     }
 
-    return { thread: newThread, newCategory };
+    return { thread, newCategory };
   }
 );
 
-export const addLocalReply = createAsyncThunk(
-  "threads/addLocalReply",
-  async (content: string, { getState }) => {
+export const addReply = createAsyncThunk(
+  "threads/addReply",
+  async (content: string, { getState, dispatch }) => {
     const state = getState() as RootState;
-    const { user } = state.auth;
+    const { token } = state.auth;
     const thread = state.threads.selectedThreadDetail;
 
-    if (!user) {
+    if (!token) {
       throw new Error("User not authenticated");
     }
 
@@ -219,23 +186,18 @@ export const addLocalReply = createAsyncThunk(
       throw new Error("No thread selected");
     }
 
-    return {
-      id: `local-post-${Date.now()}`,
-      author: {
-        id: user.id,
-        name: user.name,
-        avatar: user.avatar,
-        role: "Member",
-        posts: 0,
-        joined: new Date().toISOString().split("T")[0],
-      },
-      content,
-      timestamp: new Date().toISOString(),
-      likes: 0,
-      dislikes: 0,
-      upVotesBy: [],
-      downVotesBy: [],
-    };
+    // Create comment on backend
+    const { createComment } = await import("../../services/api");
+    const apiComment = await createComment(thread.id, content, token);
+
+    // Transform the API comment to app format
+    const { transformComment } = await import("../../utils/transformers");
+    const newPost = transformComment(apiComment);
+
+    // Re-fetch thread detail to get updated comments
+    await dispatch(loadThreadDetail(thread.id));
+
+    return newPost;
   }
 );
 
@@ -351,24 +313,23 @@ const threadsSlice = createSlice({
       .addCase(voteOnPost.rejected, (state, action) => {
         state.error = action.error.message || "Failed to vote";
       })
-      .addCase(addLocalThread.fulfilled, (state, action) => {
+      .addCase(createThread.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createThread.fulfilled, (state, action) => {
         state.threads.unshift(action.payload.thread);
         if (action.payload.newCategory) {
           state.categories.push(action.payload.newCategory);
         }
+        state.isLoading = false;
       })
-      .addCase(addLocalReply.fulfilled, (state, action) => {
-        if (state.selectedThreadDetail) {
-          state.selectedThreadDetail.posts.push(action.payload);
-          state.selectedThreadDetail.lastActivity = new Date().toISOString();
-
-          const threadIndex = state.threads.findIndex(
-            (t) => t.id === state.selectedThreadDetail?.id
-          );
-          if (threadIndex !== -1) {
-            state.threads[threadIndex] = { ...state.selectedThreadDetail };
-          }
-        }
+      .addCase(createThread.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || "Failed to create thread";
+      })
+      .addCase(addReply.fulfilled, (state, action) => {
+        // Comment is added via re-fetch in the thunk, no additional state update needed
       });
   },
 });

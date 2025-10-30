@@ -21,15 +21,16 @@ describe("authSlice reducer", () => {
   };
 
   it("should clear user data when logout is called", () => {
+    // Arrange
     const loggedInState = {
       ...initialState,
       user: { id: "1", name: "Test User", avatar: "avatar.png" },
       token: "token123",
       isAuthenticated: true,
     };
-
+    // Action
     const nextState = authReducer(loggedInState, logout());
-
+    // Assert
     expect(nextState.user).toBeNull();
     expect(nextState.token).toBeNull();
     expect(nextState.isAuthenticated).toBe(false);
@@ -37,13 +38,14 @@ describe("authSlice reducer", () => {
   });
 
   it("should clear error when clearError is called", () => {
+    // Arrange
     const errorState = {
       ...initialState,
       error: "Some error occurred",
     };
-
+    // Action
     const nextState = authReducer(errorState, clearError());
-
+    // Assert
     expect(nextState.error).toBeNull();
   });
 });

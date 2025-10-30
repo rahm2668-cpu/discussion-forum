@@ -28,6 +28,7 @@ describe("RegisterContainer Component", () => {
   const mockDispatch = vi.fn();
   const mockNavigate = vi.fn();
 
+  // 🧹 Reset mocks and set default hook return values before each test
   beforeEach(() => {
     vi.clearAllMocks();
     (useAppDispatch as Mock).mockReturnValue(mockDispatch);
@@ -40,15 +41,16 @@ describe("RegisterContainer Component", () => {
   });
 
   it("should handle input fields and dispatch registerUser on submit", async () => {
+    // 🔧 Arrange: setup userEvent and mock thunk
     const user = userEvent.setup();
     const mockThunk = vi.fn(() => ({ unwrap: vi.fn() }));
     (registerUser as unknown as Mock).mockReturnValue(mockThunk);
 
+    // ▶️ Act: render component and fill inputs
     render(<RegisterContainer />);
-
     const nameInput = screen.getByLabelText(/full name/i);
     const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/^password$/i); // match exact label
+    const passwordInput = screen.getByLabelText(/^password$/i);
     const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
     const submitButton = screen.getByRole("button", {
       name: /create account/i,
@@ -60,6 +62,7 @@ describe("RegisterContainer Component", () => {
     await user.type(confirmPasswordInput, "secret123");
     await user.click(submitButton);
 
+    // ✅ Assert: dispatch and registerUser called with correct payload
     expect(mockDispatch).toHaveBeenCalled();
     expect(registerUser).toHaveBeenCalledWith({
       name: "John Doe",
@@ -69,20 +72,26 @@ describe("RegisterContainer Component", () => {
   });
 
   it("should navigate to '/' when isAuthenticated is true", () => {
+    // 🔧 Arrange: set selector to authenticated state
     (useAppSelector as Mock).mockReturnValueOnce({
       isAuthenticated: true,
       isLoading: false,
       error: null,
     });
 
+    // ▶️ Act: render component
     render(<RegisterContainer />);
+
+    // ✅ Assert: navigate called to home page
     expect(mockNavigate).toHaveBeenCalledWith("/");
   });
 
   it("should display error if passwords do not match", async () => {
+    // 🔧 Arrange: setup userEvent
     const user = userEvent.setup();
-    render(<RegisterContainer />);
 
+    // ▶️ Act: render component and type mismatched passwords
+    render(<RegisterContainer />);
     const passwordInput = screen.getByLabelText(/^password$/i);
     const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
     const submitButton = screen.getByRole("button", {
@@ -93,7 +102,7 @@ describe("RegisterContainer Component", () => {
     await user.type(confirmPasswordInput, "wrongpass");
     await user.click(submitButton);
 
-    // Since toast is used, we can check that dispatch was not called
+    // ✅ Assert: dispatch should not be called due to validation error
     expect(mockDispatch).not.toHaveBeenCalled();
   });
 });

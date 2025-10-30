@@ -9,30 +9,32 @@ describe("leaderboardsSlice reducer", () => {
   };
 
   it("should return the initial state when given an unknown action", () => {
+    // Arrange
     const action = { type: "UNKNOWN" };
     const nextState = leaderboardsReducer(undefined, action);
     expect(nextState).toEqual(initialState);
   });
-
+  // Action
   it("should set isLoading true when loadLeaderboards.pending", () => {
     const action = { type: loadLeaderboards.pending.type };
     const nextState = leaderboardsReducer(initialState, action);
-
+    // Assert
     expect(nextState.isLoading).toBe(true);
     expect(nextState.error).toBeNull();
   });
 
   it("should update leaderboards and set isLoading false when loadLeaderboards.fulfilled", () => {
+    // Arrange
     const mockLeaderboards = [
       { user: { id: "1", name: "Alice", avatar: "a.png" }, score: 120 },
       { user: { id: "2", name: "Bob", avatar: "b.png" }, score: 100 },
     ];
-
+    // Action
     const action = {
       type: loadLeaderboards.fulfilled.type,
       payload: mockLeaderboards,
     };
-
+    // Assert
     const nextState = leaderboardsReducer(initialState, action);
 
     expect(nextState.leaderboards).toEqual(mockLeaderboards);
@@ -41,13 +43,14 @@ describe("leaderboardsSlice reducer", () => {
   });
 
   it("should set error when loadLeaderboards.rejected", () => {
+    // Arrange
     const action = {
       type: loadLeaderboards.rejected.type,
       error: { message: "Failed to fetch" },
     };
-
+    // Action
     const nextState = leaderboardsReducer(initialState, action);
-
+    // Assert
     expect(nextState.isLoading).toBe(false);
     expect(nextState.error).toBe("Failed to fetch");
   });

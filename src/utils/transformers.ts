@@ -87,13 +87,7 @@ export function transformThreadDetail(
   apiThreadDetail: ApiThreadDetail,
   owner?: ApiUser
 ): Thread {
-  const defaultUser: ApiUser = {
-    id: apiThreadDetail.ownerId,
-    name: "Unknown User",
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiThreadDetail.ownerId}`,
-  };
-
-  const threadOwner = owner || defaultUser;
+  const threadOwner = owner || apiThreadDetail.owner;
 
   const initialPost: Post = {
     id: `${apiThreadDetail.id}-initial`,
