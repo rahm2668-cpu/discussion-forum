@@ -1,17 +1,16 @@
-import {
-  Pin, Lock, MessageSquare, Eye,
-} from 'lucide-react';
-import {formatDistanceToNow} from 'date-fns';
-import {Thread} from '../../types/forum';
-import {Avatar, AvatarFallback, AvatarImage} from '../ui/avatar';
+import { Pin, Lock, MessageSquare, Eye } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { Thread } from "../../types/forum";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface ThreadListItemProps {
   thread: Thread;
   onClick: () => void;
 }
 
-export function ThreadListItem({thread, onClick}: ThreadListItemProps) {
-  const formatDate = (dateString: string) => formatDistanceToNow(new Date(dateString), {addSuffix: true});
+export function ThreadListItem({ thread, onClick }: ThreadListItemProps) {
+  const formatDate = (dateString: string) =>
+    formatDistanceToNow(new Date(dateString), { addSuffix: true });
 
   const replyCount = thread.posts.length - 1;
   const lastPost = thread.posts[thread.posts.length - 1];
@@ -30,10 +29,10 @@ export function ThreadListItem({thread, onClick}: ThreadListItemProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-2 mb-1">
             {thread.isPinned && (
-              <Pin className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+              <Pin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
             )}
             {thread.isLocked && (
-              <Lock className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <Lock className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
             )}
             <h3 className="flex-1 truncate">{thread.title}</h3>
           </div>
@@ -48,18 +47,12 @@ export function ThreadListItem({thread, onClick}: ThreadListItemProps) {
             <div className="flex items-center gap-1">
               <MessageSquare className="w-4 h-4" />
               <span>
-                {replyCount}
-                {' '}
-                {replyCount === 1 ? 'comment' : 'comments'}
+                {replyCount} {replyCount === 1 ? "comment" : "comments"}
               </span>
             </div>
             <div className="flex items-center gap-1">
               <Eye className="w-4 h-4" />
-              <span>
-                {thread.views.toLocaleString()}
-                {' '}
-                views
-              </span>
+              <span>{thread.views.toLocaleString()} views</span>
             </div>
           </div>
         </div>
@@ -67,7 +60,10 @@ export function ThreadListItem({thread, onClick}: ThreadListItemProps) {
         <div className="hidden md:flex flex-col items-end gap-1">
           <div className="flex items-center gap-2">
             <Avatar className="w-6 h-6">
-              <AvatarImage src={lastPost.author.avatar} alt={lastPost.author.name} />
+              <AvatarImage
+                src={lastPost.author.avatar}
+                alt={lastPost.author.name}
+              />
               <AvatarFallback>{lastPost.author.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <span className="text-sm">{lastPost.author.name}</span>

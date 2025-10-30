@@ -1,22 +1,14 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { loadThreadsByUserId } from "../store/slices/threadsSlice";
 import { ThreadListItem } from "../components/ui-components/ThreadListItem";
+import { Thread } from "../types/forum";
 
 export function UserThreadsPage() {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { userThreads, isLoadingUserThreads } = useAppSelector(
-    (state) => state.threads
-  );
-
-  useEffect(() => {
-    if (userId) {
-      dispatch(loadThreadsByUserId(userId));
-    }
-  }, [dispatch, userId]);
+  const { threads } = useAppSelector((state) => state.threads);
 
   const handleThreadClick = (threadId: string) => {
     navigate(`/threads/${threadId}`);
@@ -26,18 +18,8 @@ export function UserThreadsPage() {
     return <div className="container mx-auto px-4 py-8">User not found</div>;
   }
 
-  if (isLoadingUserThreads) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center py-12">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-8 h-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            <p className="text-muted-foreground">Loading threads...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Filter threads by userId
+  const userThreads = threads.filter((thread) => thread.author.id === userId);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -52,7 +34,7 @@ export function UserThreadsPage() {
             No threads found for this user.
           </div>
         ) : (
-          userThreads.map((thread) => (
+          userThreads.map((thread: Thread) => (
             <ThreadListItem
               key={thread.id}
               thread={thread}

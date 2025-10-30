@@ -9,7 +9,7 @@ import { ReplyForm } from "../components/ui-components/ReplyForm";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   loadThreadDetail,
-  addLocalReply,
+  addReply,
   voteOnPost,
 } from "../store/slices/threadsSlice";
 
@@ -45,14 +45,11 @@ export function ThreadDetail() {
     }
 
     try {
-      await dispatch(addLocalReply(content)).unwrap();
-      toast.success("Reply added locally (demo mode)");
-      toast.info(
-        "Replying requires authentication. Using read-only API access."
-      );
+      await dispatch(addReply(content)).unwrap();
+      toast.success("Reply posted successfully!");
     } catch (error) {
       console.error("Error posting reply:", error);
-      toast.error("Failed to post reply");
+      toast.error("Failed to post reply. Please try again.");
     }
   };
 

@@ -3,7 +3,7 @@ import { loginUser, registerUser } from "./authSlice";
 import { login, register, getOwnProfile } from "../../services/api";
 import type { ApiUser } from "../../services/api";
 
-// 🧠 Mock localStorage agar tidak error di Node.js
+// 🧠 Mock localStorage so code using localStorage won't throw errors in Node.js
 const localStorageMock = {
   getItem: vi.fn(),
   setItem: vi.fn(),
@@ -14,14 +14,14 @@ Object.defineProperty(global, "localStorage", {
   value: localStorageMock,
 });
 
-// 🧠 Mock semua fungsi dari services/api
+// 🧠 Mock all functions from services/api to control them during tests
 vi.mock("../../services/api", () => ({
   login: vi.fn(),
   register: vi.fn(),
   getOwnProfile: vi.fn(),
 }));
 
-// 🧹 Reset semua mock sebelum setiap test
+// 🧹 Clear all mocks before each test to avoid leftover state
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -35,14 +35,17 @@ describe("authSlice async thunks", () => {
   };
 
   it("should login and return token + user when loginUser is fulfilled", async () => {
+    // 🔧 Arrange: set up mock responses
     (login as Mock).mockResolvedValue("mockToken123");
     (getOwnProfile as Mock).mockResolvedValue(mockUser);
 
+    // ▶️ Act: dispatch the thunk
     const thunk = loginUser({ email: "john@example.com", password: "123456" });
     const dispatch = vi.fn();
     const getState = vi.fn();
     const result = await thunk(dispatch, getState, undefined);
 
+    // ✅ Assert: verify behavior and returned values
     expect(login).toHaveBeenCalledWith({
       email: "john@example.com",
       password: "123456",
@@ -53,10 +56,12 @@ describe("authSlice async thunks", () => {
   });
 
   it("should register and return token + user when registerUser is fulfilled", async () => {
+    // 🔧 Arrange: set up mock responses
     (register as Mock).mockResolvedValueOnce(undefined);
     (login as Mock).mockResolvedValueOnce("newToken456");
     (getOwnProfile as Mock).mockResolvedValueOnce(mockUser);
 
+    // ▶️ Act: dispatch the thunk
     const thunk = registerUser({
       name: "John Doe",
       email: "john@example.com",
@@ -66,6 +71,7 @@ describe("authSlice async thunks", () => {
     const getState = vi.fn();
     const result = await thunk(dispatch, getState, undefined);
 
+    // ✅ Assert: verify behavior and returned values
     expect(register).toHaveBeenCalledWith({
       name: "John Doe",
       email: "john@example.com",

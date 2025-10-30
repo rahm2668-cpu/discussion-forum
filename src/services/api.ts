@@ -12,7 +12,16 @@ export interface ApiThread {
   totalComments: number;
 }
 
-export interface ApiThreadDetail extends ApiThread {
+export interface ApiThreadDetail {
+  id: string;
+  title: string;
+  body: string;
+  category: string;
+  createdAt: string;
+  owner: ApiUser;
+  upVotesBy: string[];
+  downVotesBy: string[];
+  totalComments: number;
   comments: ApiComment[];
 }
 

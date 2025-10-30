@@ -86,9 +86,9 @@ export function PostCard({
           <div className="flex items-center gap-2">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
-                variant={hasUpVoted ? "default" : "ghost"}
+                variant="ghost"
                 size="sm"
-                className={`gap-2 ${hasUpVoted ? "bg-red-500 hover:bg-red-600 text-white" : ""}`}
+                className={`gap-2 ${hasUpVoted ? "bg-blue-500 hover:bg-blue-600 text-white" : ""}`}
                 onClick={() => onUpVote?.(post.id)}
               >
                 <ThumbsUp className="w-4 h-4" />
@@ -97,9 +97,9 @@ export function PostCard({
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
-                variant={hasDownVoted ? "destructive" : "ghost"}
+                variant="ghost"
                 size="sm"
-                className={`gap-2 ${hasDownVoted ? "bg-blue-500 hover:bg-blue-600 text-white" : ""}`}
+                className={`gap-2 ${hasDownVoted ? "bg-red-500 hover:bg-red-600 text-white" : ""}`}
                 onClick={() => onDownVote?.(post.id)}
               >
                 <ThumbsDown className="w-4 h-4" />
